@@ -1,10 +1,10 @@
 import pandas as pd
 
 
-def get_users_dataset():
+def get_users_dataset(n=1000):
     users = pd.read_csv('raw-data/users.tsv', sep='\t')
 
-    users_dataset = users.loc[users["WindowID"] == 1].sample(1000)
+    users_dataset = users.loc[users["WindowID"] == 1].sample(n)
 
     return users_dataset[["UserID", "State", "Major"]]
 
@@ -20,14 +20,14 @@ def get_applications_dataset(users_dataset):
 
 
 def get_jobs_dataset(applications_dataset):
-    jobs_window1 = pd.read_csv('raw-data/splitjobs/jobs1.tsv', 
+    jobs_window_1 = pd.read_csv('raw-data/splitjobs/jobs1.tsv', 
                             sep='\t',
                             on_bad_lines='skip',
                             low_memory=False)
 
     jobs_applications = applications_dataset["JobID"].unique()
 
-    jobs_dataset = jobs_window1.loc[jobs_window1["JobID"].isin(jobs_applications)]
+    jobs_dataset = jobs_window_1.loc[jobs_window_1["JobID"].isin(jobs_applications)]
 
     return jobs_dataset[["JobID", "Title", "State"]]
 
