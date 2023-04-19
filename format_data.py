@@ -1,35 +1,35 @@
 import pandas as pd
 
 
-def get_users_dataset(n=1000):
-    users = pd.read_csv('raw-data/users.tsv', sep='\t')
-
-    users_dataset = users.loc[users["WindowID"] == 1].sample(n)
-
-    return users_dataset[["UserID", "State", "Major"]]
-
-
-def get_applications_dataset(users_dataset):
-    applications = pd.read_csv('raw-data/apps.tsv', sep='\t')
-
-    unique_users = users_dataset["UserID"].unique()
-
-    applications_dataset = applications.loc[applications["UserID"].isin(unique_users)]
-
-    return applications_dataset[["UserID", "JobID", "ApplicationDate"]]
-
-
-def get_jobs_dataset(applications_dataset):
+def get_jobs_dataset(n=1000):
     jobs_window_1 = pd.read_csv('raw-data/splitjobs/jobs1.tsv', 
                             sep='\t',
                             on_bad_lines='skip',
                             low_memory=False)
 
-    jobs_applications = applications_dataset["JobID"].unique()
-
-    jobs_dataset = jobs_window_1.loc[jobs_window_1["JobID"].isin(jobs_applications)]
+    jobs_dataset = jobs_window_1.sample(n)
 
     return jobs_dataset[["JobID", "Title", "State"]]
+
+
+def get_applications_dataset(jobs_dataset):
+    applications = pd.read_csv('raw-data/apps.tsv', sep='\t')
+
+    unique_jobs = jobs_dataset["JobID"].unique()
+
+    applications_dataset = applications.loc[applications["JobID"].isin(unique_jobs)]
+
+    return applications_dataset[["UserID", "JobID", "ApplicationDate"]]
+
+
+def get_users_dataset(applications_dataset):
+    users = pd.read_csv('raw-data/users.tsv', sep='\t')
+
+    users_applications = applications_dataset["UserID"].unique()
+
+    users_dataset = users.loc[users["UserID"].isin(users_applications)]
+
+    return users_dataset[["UserID", "State", "Major"]]
 
 
 def get_states_dataset(users_dataset, jobs_dataset):
@@ -51,12 +51,12 @@ def get_states_dataset(users_dataset, jobs_dataset):
 
 
 if __name__ == '__main__':
-    users_dataset = get_users_dataset()
-    applications_dataset = get_applications_dataset(users_dataset)
-    jobs_dataset = get_jobs_dataset(applications_dataset)
-    states_dataset = get_states_dataset(users_dataset)
+    jobs_dataset = get_jobs_dataset(n=1000)
+    applications_dataset = get_applications_dataset(jobs_dataset)
+    users_dataset = get_users_dataset(applications_dataset)
+    states_dataset = get_states_dataset(users_dataset, jobs_dataset)
 
-    users_dataset.to_csv("data/users.csv", index=False)
-    applications_dataset.to_csv("data/applications.csv", index=False)
     jobs_dataset.to_csv("data/jobs.csv", index=False)
+    applications_dataset.to_csv("data/applications.csv", index=False)
+    users_dataset.to_csv("data/users.csv", index=False)
     states_dataset.to_csv("data/states.csv", index=False)
