@@ -1,3 +1,4 @@
 raw-data/*
 venv/
 EDA.ipynb
+!raw-data/.gitkeep

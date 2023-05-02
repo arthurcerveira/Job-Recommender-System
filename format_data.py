@@ -51,7 +51,7 @@ def get_states_dataset(users_dataset, jobs_dataset):
 
 
 if __name__ == '__main__':
-    jobs_dataset = get_jobs_dataset(n=1000)
+    jobs_dataset = get_jobs_dataset(n=20_000)
     applications_dataset = get_applications_dataset(jobs_dataset)
     users_dataset = get_users_dataset(applications_dataset)
     states_dataset = get_states_dataset(users_dataset, jobs_dataset)
